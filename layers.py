@@ -369,13 +369,22 @@ class Dropout(Layer):
 
         # Arguments
             inputs: numpy array
-
         # Returns
             outputs: numpy array
         """
         outputs = None
         #############################################################
         # code here
+
+        if(self.seed):
+            np.random.seed(self.seed)
+
+        if(self.training):
+            self.mask = np.random.binomial(1, self.ratio, size=inputs.shape)
+            outputs = self.mask * inputs
+            outputs = outputs / (1 - self.ratio) 
+        else:
+            outputs = inputs
         #############################################################
         return outputs
 
@@ -392,6 +401,7 @@ class Dropout(Layer):
         out_grads = None
         #############################################################
         # code here
+        out_grads = (in_grads * self.mask) / (1 - self.ratio)
         #############################################################
         return out_grads
 
