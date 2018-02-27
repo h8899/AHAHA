@@ -16,6 +16,7 @@ targets = np.random.randint(num_class, size=batch)
 loss = SoftmaxCrossEntropy(num_class)
 out, _ = loss.forward(inputs, targets)
 
+
 keras_inputs = K.softmax(inputs)
 keras_targets = np.zeros(inputs.shape, dtype='int')
 

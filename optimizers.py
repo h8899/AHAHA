@@ -67,7 +67,7 @@ class SGD(Optimizer):
             self.lr = self.sheduler(self.sheduler_func, iteration)
 
         # initialize self.moments
-        if not self.moments:
+        if not self.moments:    
             self.moments = {}
             for k, v in xs_grads.items():
                 self.moments[k] = np.zeros(v.shape)
@@ -78,7 +78,8 @@ class SGD(Optimizer):
         #############################################################
         # remove pass and code in for loop
         #############################################################
-            pass
+            self.moments[k] = self.momentum * prev_moments[k] - self.lr * xs_grads[k]
+            new_xs[k] = xs[k] + self.moments[k]
         return new_xs
 
 class Adam(Optimizer):
@@ -133,7 +134,9 @@ class Adam(Optimizer):
         #############################################################
         # remove pass and code in for loop
         #############################################################
-            pass
+            self.moments = self.beta_1 * self.moments + (1 - self.beta_1) * xs_grads[k]
+            self.accumulators[k] = self.beta_2 * self.accumulators[k] + (1 - self.beta2)*(xs_grads[k]**2)
+            new_xs[k] = xs[k] - self.lr * self.moments / (np.sqrt(self.accumulators[k]) + self.epsilon)
         return new_xs
 
 class Adagrad(Optimizer):
