@@ -17,7 +17,7 @@ params = { 'kernel_h': 5,
 'pad': 0,
 'stride': 2,
 'in_channel': inputs.shape[1],
-'out_channel': 64,
+'out_channel': 64
 }
 
 layer = Convolution(params)

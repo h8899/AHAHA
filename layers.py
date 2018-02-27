@@ -6,6 +6,7 @@ change log:
 import numpy as np 
 from utils.tools import *
 from img2col import *
+import math
 
 class Layer(object):
     """
@@ -72,6 +73,10 @@ class FCLayer(Layer):
         outputs = None
         #############################################################
         # code here
+        bias = list(map(lambda x: self.bias, np.zeros(inputs.shape[0])))
+
+        outputs = np.dot(inputs, self.weights) + np.array(bias)
+
         #############################################################
         return outputs
 
@@ -332,6 +337,31 @@ class Pooling(Layer):
         outputs = None
         #############################################################
         # code here
+        out_h = int((inputs.shape[2] + self.pad * 2 - self.pool_height) / self.stride + 1)
+        out_w = int((inputs.shape[3] + self.pad * 2 - self.pool_width) / self.stride + 1)
+        outputs = np.zeros((inputs.shape[0], inputs.shape[1], out_h, out_w))
+        self.loc = np.zeros(outputs.shape, dtype=object)
+
+        for d in range(inputs.shape[0]):
+            for c in range(inputs.shape[1]):
+                for i in range(out_h):
+                    for j in range(out_w):
+                        if(self.pool_type == 'avg'):
+                            outputs[d, c, i, j] = 0
+                        else:
+                            outputs[d, c, i, j] = -float('inf')
+
+                        for p in range(self.pool_height):
+                            ii = i * self.stride + p
+                            for q in range(self.pool_width):
+                                jj = j * self.stride + q
+                                if(self.pool_type == 'avg'):
+                                    outputs[d, c, i, j] += inputs[d, c, ii, jj] / (self.pool_height * self.pool_width)
+                                else:
+                                    if(outputs[d, c, i, j] < inputs[d, c, ii, jj]):
+                                        outputs[d, c, i, j] = inputs[d, c, ii, jj]
+                                        self.loc[d, c, i, j] = (ii, jj)
+
         #############################################################
         return outputs
         
@@ -345,9 +375,17 @@ class Pooling(Layer):
         # Returns
             out_grads: numpy array with shape (batch, in_channel, in_height, in_width), gradients to inputs
         """
-        out_grads = None
+        out_grads = np.zeros(inputs.shape)
         #############################################################
         # code here
+        if(self.pool_type == 'max'):
+            for d in range(inputs.shape[0]):
+                for c in range(inputs.shape[1]):
+                    for i in range(in_grads.shape[2]):
+                        for j in range(in_grads.shape[3]):
+                            ii, jj = self.loc[d, c, i, j]
+                            out_grads[d, c, ii, jj] += in_grads[d, c, i, j]
+
         #############################################################
         return out_grads
 
