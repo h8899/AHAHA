@@ -1,4 +1,6 @@
 import numpy as np
+from functools import reduce
+import math
 
 class Loss(object):
     
@@ -40,10 +42,22 @@ class SoftmaxCrossEntropy(Loss):
             outputs: float, batch loss
             probs: numpy array with shape (batch, num_class), probability to each category with respect to each image
         """
-        outputs = None
-        probs = None
+        outputs = 0
         #############################################################
         # code here
+
+        # This is to clone the inputs
+        probs = np.array(list(inputs))
+
+        batch_size, num_class = inputs.shape
+        for i in range(batch_size):
+            logits_sum = reduce( (lambda x, y: x + math.exp(y)), np.insert(inputs[i, :], 0, 0) )
+            probs[i, :] = np.array( list( map( lambda x: (math.exp(x) / logits_sum), inputs[i, :] ) ) )
+            # predicted_class = np.argmax(softmax_outputs[i, :])
+            # probs[i, predicted_class] = 1
+            outputs += (-math.log(probs[i, targets[i]]))
+
+        outputs = outputs / batch_size 
         #############################################################
         return outputs, probs
 
@@ -57,9 +71,19 @@ class SoftmaxCrossEntropy(Loss):
         # Returns
             out_grads: numpy array with shape (batch, num_class), gradients to inputs 
         """
-        out_grads = None
+        out_grads = np.zeros(inputs.shape)
         #############################################################
         # code here
+        _, probs = self.forward(inputs, targets)
+        batch_size, num_class = inputs.shape
+        for i in range(batch_size):
+            for j in range(num_class):
+                if(j == targets[i]):
+                    out_grads[i, j] = probs[i, j] - 1
+                else: 
+                    out_grads[i, j] = probs[i, j]
+
+        out_grads /= batch_size
         #############################################################
         return out_grads
 

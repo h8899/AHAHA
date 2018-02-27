@@ -63,9 +63,9 @@ def eval_numerical_gradient_loss(loss, inputs, targets, h=1e-5):
 
         oldval = inputs[idx]
         inputs[idx] = oldval + h
-        pos = loss.forward(inputs, targets)[0].copy()
+        pos = loss.forward(inputs, targets)[0]
         inputs[idx] = oldval - h
-        neg = loss.forward(inputs, targets)[0].copy()
+        neg = loss.forward(inputs, targets)[0]
         inputs[idx] = oldval
 
         grads[idx] = np.sum((pos - neg)) / (2 * h)

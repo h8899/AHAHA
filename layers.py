@@ -72,7 +72,6 @@ class FCLayer(Layer):
         """
         outputs = None
         #############################################################
-        # code here
         bias = list(map(lambda x: self.bias, np.zeros(inputs.shape[0])))
 
         outputs = np.dot(inputs, self.weights) + np.array(bias)
@@ -93,6 +92,13 @@ class FCLayer(Layer):
         out_grads = None
         #############################################################
         # code here
+
+        self.w_grad = np.dot(inputs.T, in_grads)
+
+        for i in range(self.bias.shape[0]):
+            self.b_grad[i] = np.sum(in_grads[:, i])
+
+        out_grads = np.dot(in_grads, (self.weights).T)
         #############################################################
         return out_grads
 

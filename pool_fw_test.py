@@ -14,7 +14,7 @@ params = { 'pool_type': 'max',
 'pool_height': 5,
 'pool_width': 5,
 'pad': 0,
-'stride': 2,
+'stride': 2,	
 }
 layer = Pooling(params)
 out = layer.forward(inputs)
