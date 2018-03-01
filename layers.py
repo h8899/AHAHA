@@ -227,7 +227,6 @@ class Convolution(Layer):
 
         # (64, 2250) *(kernel_h * kernel_w, 2250).T
         self.w_grad = np.dot(in_grads_reshaped, X_col.T)
-        print(self.weights.shape)
         self.w_grad = self.w_grad.reshape(self.weights.shape)
 
         W_reshaped = self.weights.reshape(num_filters, -1)
